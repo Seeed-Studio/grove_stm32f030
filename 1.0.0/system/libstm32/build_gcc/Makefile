@@ -24,9 +24,8 @@ SUBMAKE_OPTIONS=--no-builtin-rules --no-builtin-variables --no-print-directory
 # Rules
 #-------------------------------------------------------------------------------
 
-# libstm_stm32f030_gcc_rel.a 
-#all: libstm_stm32f030_gcc_rel.a 
-all: libstm_stm32f030_gcc_rel.a 
+# libstm_stm32f030_gcc_rel.a
+all: libstm_stm32f030_gcc_rel.a
 
 .PHONY: libstm_stm32f030_gcc_rel.a
 libstm_stm32f030_gcc_rel.a:
@@ -42,7 +41,7 @@ clean:
 	@echo ------------------------------------------------------------------------------------
 
 	@echo --- Cleaning stm32f030 release and debug
-	@$(MAKE) CHIP=STM32F030 $(SUBMAKE_OPTIONS) -f stm32.mk $@
+	@$(MAKE) CHIP=STM32F030 $(SUBMAKE_OPTIONS) OUTPUT_BIN=../../../variants/STM32F030 -f stm32.mk $@
 	@echo ------------------------------------------------------------------------------------
 
 

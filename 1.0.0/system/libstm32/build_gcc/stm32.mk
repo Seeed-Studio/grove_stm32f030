@@ -19,7 +19,7 @@
 
 # Makefile for compiling libchip
 .SUFFIXES: .o .a .c .s
-SUB_MAKEFILES=debug.mk gcc.mk release.mk win.mk sam3s.mk
+SUB_MAKEFILES=debug.mk gcc.mk release.mk win.mk
 
 LIBNAME=libstm
 TOOLCHAIN=gcc
@@ -42,7 +42,7 @@ endif
 #-------------------------------------------------------------------------------
 
 # Output directories
-OUTPUT_BIN = ../../../cores/arduino
+OUTPUT_BIN ?= ../../../cores/arduino
 
 # Libraries
 PROJECT_BASE_PATH = ..
@@ -151,7 +151,7 @@ create_output:
 	@echo -------------------------
 
 #	@mkdir $(subst /,$(SEP),$(OUTPUT_BIN)) 1>$(DEV_NUL) 2>&1
-	@mkdir $(OUTPUT_PATH) 1>$(DEV_NUL) 2>&1
+	@-mkdir $(OUTPUT_PATH) 1>$(DEV_NUL) 2>&1
 	@echo ------------------------------------------------------------------------------------
 
 $(addprefix $(OUTPUT_PATH)/,$(C_OBJ)): $(OUTPUT_PATH)/%.o: %.c
