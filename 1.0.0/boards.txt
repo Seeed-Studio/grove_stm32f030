@@ -1,0 +1,25 @@
+
+# Grove STM32F030
+# ---------------------------------------
+GroveSTM32F030.name=Grove STM32F030
+GroveSTM32F030.vid.0=
+GroveSTM32F030.pid.0=
+GroveSTM32F030.upload.tool=stm32flash
+GroveSTM32F030.upload.protocol=sam-ba
+GroveSTM32F030.upload.maximum_size=15360
+GroveSTM32F030.upload.maximum_data_size=3840
+GroveSTM32F030.upload.use_1200bps_touch=false
+GroveSTM32F030.upload.wait_for_upload_port=false
+GroveSTM32F030.upload.native_usb=false
+GroveSTM32F030.build.mcu=cortex-m0
+GroveSTM32F030.build.f_cpu=48000000L
+GroveSTM32F030.build.usb_product="Grove STM32F030"
+GroveSTM32F030.build.board=GroveSTM32F030
+GroveSTM32F030.build.core=arduino
+GroveSTM32F030.build.extra_flags=-DSTM32F030 -mthumb {build.usb_flags}
+GroveSTM32F030.build.ldscript=linker_scripts/gcc/flash.ld
+GroveSTM32F030.build.variant=STM32F030
+GroveSTM32F030.build.variant_system_lib=libstm_stm32f030_gcc_rel.a
+GroveSTM32F030.build.vid=
+GroveSTM32F030.build.pid=
+
