@@ -10,7 +10,7 @@
       },
       "platforms": [
        	{
-          "name": "Grove series",
+          "name": "Grove Series",
           "architecture": "Grove_STM32F030",
           "version": "1.0.0",
           "category": "Contributed",
@@ -88,24 +88,24 @@
               "checksum": "",
               "size": ""
             },
-			{
+            {
               "host": "x86_64-apple-darwin",
               "url": "",
-			  "archiveFileName": "",
+              "archiveFileName": "",
               "checksum": "",
               "size": ""
             },
             {
               "host": "x86_64-pc-linux-gnu",
               "url": "",
-			  "archiveFileName": "",
+              "archiveFileName": "",
               "checksum": "",
               "size": ""
             },
             {
               "host": "i686-pc-linux-gnu",
               "url": "",
-			  "archiveFileName": "",
+              "archiveFileName": "",
               "checksum": "",
               "size": ""
             }
