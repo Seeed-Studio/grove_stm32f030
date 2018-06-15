@@ -22,7 +22,7 @@
 // Frequency of the board main oscillator
 #define VARIANT_MAINOSC		8000000
 // Master clock frequency
-#define VARIANT_MCK			48000000
+#define VARIANT_MCK		48000000
 
 #include "Arduino.h"
 #ifdef __cplusplus
@@ -46,7 +46,7 @@ extern "C"{
 #define digitalPinToInterrupt(p)  p
 
 #define PA0  	4
-#define PA1		5
+#define PA1	5
 #define PA2  	1
 #define PA3  	0
 #define PA4  	10
@@ -72,12 +72,14 @@ static const uint8_t SCK  = 11;
 static const uint8_t MISO = 12;
 static const uint8_t MOSI = 13;
 
-static const uint8_t A0 = 4;
-static const uint8_t A1 = 5;
-static const uint8_t A2 = 11;
-static const uint8_t A3 = 12;
-static const uint8_t A4 = 13;
-static const uint8_t A5 = 14;
+static const uint8_t A0 = PA0;
+static const uint8_t A1 = PA1;
+static const uint8_t A2 = PA2;
+static const uint8_t A3 = PA3;
+static const uint8_t A4 = PA4;
+static const uint8_t A5 = PA5;
+static const uint8_t A6 = PA6;
+static const uint8_t A7 = PA7;
 
 
 extern const unsigned int pin_ADC_Channel[];

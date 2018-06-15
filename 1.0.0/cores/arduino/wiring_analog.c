@@ -56,10 +56,13 @@ uint32_t analogRead(uint32_t ulPin)
 	uint32_t ulChannel;
 	ADC_InitTypeDef     ADC_InitStructure;
 
+	// TODO: Bug fix
+	#if 0
 	if(ulPin < A0)
 	{
 		ulPin += A0;
 	}
+	#endif
 
 	ulChannel = pin_ADC_Channel[ulPin] ;
 
@@ -67,23 +70,23 @@ uint32_t analogRead(uint32_t ulPin)
 	{
 		return -1;
 	}
-	
+
 	pinMode(ulPin, ANALOG);
-	
+
 	// Convert the ADC1 temperature sensor  with 55.5 Cycles as sampling time
 	ADC_ChannelConfig(ADC1, ulChannel , ADC_SampleTime_55_5Cycles);
-	
+
 	// Start ADC1 Software Conversion
 	ADC_StartOfConversion(ADC1);
 
 	// Wait until conversion completion
 	// while(ADC_GetFlagStatus(ADC1, ADC_FLAG_EOC) == RESET);
-	while(!ADC_GetFlagStatus(ADC1, ADC_FLAG_EOC));
+	while (!ADC_GetFlagStatus(ADC1, ADC_FLAG_EOC));
 
 	// Read the value
 	ulValue = ADC_GetConversionValue(ADC1);
 	ulValue = mapResolution(ulValue, ADC_RESOLUTION, _readResolution);
-	
+
 	return ulValue;
 }
 

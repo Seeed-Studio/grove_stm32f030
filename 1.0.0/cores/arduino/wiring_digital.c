@@ -36,31 +36,32 @@ void pinMode( uint32_t ulPin, uint32_t ulMode )
 	
 	GPIO_InitStructure.GPIO_Pin = gpio_pin;
 	GPIO_InitStructure.GPIO_PuPd = g_APinDescription[ulPin].ulPinPuPd;
-	
+
 	switch(ulMode)
 	{
 		case INPUT:
 			GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IN;
 			break ;
-		
+
 		case INPUT_PULLUP:
 			GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IN;
 			GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_UP;
 			break;
-			
+
 		case INPUT_PULLDOWN:
 			GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IN;
 			GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_DOWN;
 			break;
-			
+
 		case OUTPUT:
 			GPIO_InitStructure.GPIO_Mode = GPIO_Mode_OUT;
 			break ;
-		
+
 		case ALTERNATE:
 			GPIO_PinAFConfig(gpio_port, g_APinDescription[ulPin].ulPin & 0xF, g_APinDescription[ulPin].ulPinAFMode);
 			GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF;
 			break;
+
 		case ANALOG:
 			GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AN;
 			break;

@@ -25,21 +25,21 @@ extern "C" {
 
 // Pins descriptions
 extern const PinDescription g_APinDescription[]=
-{	
-	{ GPIOA,  3,  RCC_AHBPeriph_GPIOA, GPIO_OType_PP, GPIO_PuPd_NOPULL, GPIO_Speed_50MHz, GPIO_AF_1 }, // 0  : RX 
+{
+	{ GPIOA,  3,  RCC_AHBPeriph_GPIOA, GPIO_OType_PP, GPIO_PuPd_NOPULL, GPIO_Speed_50MHz, GPIO_AF_1 }, // 0  : RX
 	{ GPIOA,  2,  RCC_AHBPeriph_GPIOA, GPIO_OType_PP, GPIO_PuPd_NOPULL, GPIO_Speed_50MHz, GPIO_AF_1 }, // 1  : TX
-	
+
 	{ GPIOA,  9,  RCC_AHBPeriph_GPIOA, GPIO_OType_OD, GPIO_PuPd_NOPULL, GPIO_Speed_50MHz, GPIO_AF_4 }, // 2  : SCL
 	{ GPIOA, 10,  RCC_AHBPeriph_GPIOA, GPIO_OType_OD, GPIO_PuPd_NOPULL, GPIO_Speed_50MHz, GPIO_AF_4 }, // 3  : SDA
-	
-	{ GPIOA,  0,  RCC_AHBPeriph_GPIOA, GPIO_OType_PP, GPIO_PuPd_NOPULL, GPIO_Speed_50MHz,         0 }, // 4  : ADC 
+
+	{ GPIOA,  0,  RCC_AHBPeriph_GPIOA, GPIO_OType_PP, GPIO_PuPd_NOPULL, GPIO_Speed_50MHz,         0 }, // 4  : ADC
 	{ GPIOA,  1,  RCC_AHBPeriph_GPIOA, GPIO_OType_PP, GPIO_PuPd_NOPULL, GPIO_Speed_50MHz,         0 }, // 5  : ADC
-	
-	{ GPIOA, 13,  RCC_AHBPeriph_GPIOA, GPIO_OType_PP, GPIO_PuPd_NOPULL, GPIO_Speed_50MHz,         0 }, // 6  :  
+
+	{ GPIOA, 13,  RCC_AHBPeriph_GPIOA, GPIO_OType_PP, GPIO_PuPd_NOPULL, GPIO_Speed_50MHz,         0 }, // 6  :
 	{ GPIOA, 14,  RCC_AHBPeriph_GPIOA, GPIO_OType_PP, GPIO_PuPd_NOPULL, GPIO_Speed_50MHz,         0 }, // 7  :
-	{ GPIOF,  0,  RCC_AHBPeriph_GPIOF, GPIO_OType_PP, GPIO_PuPd_NOPULL, GPIO_Speed_50MHz,         0 }, // 8  :  
+	{ GPIOF,  0,  RCC_AHBPeriph_GPIOF, GPIO_OType_PP, GPIO_PuPd_NOPULL, GPIO_Speed_50MHz,         0 }, // 8  :
 	{ GPIOF,  1,  RCC_AHBPeriph_GPIOF, GPIO_OType_PP, GPIO_PuPd_NOPULL, GPIO_Speed_50MHz,         0 }, // 9  :
-	
+
 	{ GPIOA,  4,  RCC_AHBPeriph_GPIOA, GPIO_OType_PP, GPIO_PuPd_NOPULL, GPIO_Speed_50MHz, GPIO_AF_4 }, // 10 : PWM/SS
 	{ GPIOA,  5,  RCC_AHBPeriph_GPIOA, GPIO_OType_PP, GPIO_PuPd_NOPULL, GPIO_Speed_50MHz, GPIO_AF_0 }, // 11 : ADC/SCK
 	{ GPIOA,  6,  RCC_AHBPeriph_GPIOA, GPIO_OType_PP, GPIO_PuPd_NOPULL, GPIO_Speed_50MHz, GPIO_AF_0 }, // 12 : ADC/MISO
@@ -53,8 +53,8 @@ extern const PinDescription g_APinDescription[]=
 // ADC Channel
 extern const unsigned int pin_ADC_Channel[]=
 {
-	NONE,          // 0
-	NONE,          // 1
+	ADC_Channel_3, // 0
+	ADC_Channel_2, // 1
 	NONE,          // 2
 	NONE,          // 3	
 	ADC_Channel_0, // 4
@@ -63,7 +63,7 @@ extern const unsigned int pin_ADC_Channel[]=
 	NONE,          // 7
 	NONE,          // 8
 	NONE,          // 9
-	NONE,          // 10
+	ADC_Channel_4, // 10
 	ADC_Channel_5, // 11
 	ADC_Channel_6, // 12
 	ADC_Channel_7, // 13
@@ -246,7 +246,6 @@ void bootloader(void)
 		// Jump to application
 		Jump_To_Bootloader();
 	}
-	
 }
 
 #ifdef __cplusplus
