@@ -360,6 +360,10 @@ void requestEvent(void)
 		break;
 	}
 
+	#if 0
 	devData->regAddr = REG_NULL;
+	#else
+	// Continuous reading is OK
+	#endif
 	return;
 }
