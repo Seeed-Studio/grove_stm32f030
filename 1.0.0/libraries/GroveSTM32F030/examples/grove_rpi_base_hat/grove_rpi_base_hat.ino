@@ -196,17 +196,18 @@ void setup()
 
 void loop()
 {
-	uint16_t v;
+	uint32_t v;
 
 	// Get ADC Value & Voltage
 	for (int i = 0; i < ADC_NR; i++) {
 		devData->adcRaw[i] = analogRead(adcPins[i]);
 
-		v = (uint32_t)ADC_REF_VOLT * devData->adcRaw[i] / ADC_FULL_RANGE;
+		v = (uint32_t)ADC_REF_VOLT * devData->adcRaw[i];
 		// divider resistance used for RPI version
 		if (devData->devType == _DEV_BASE_HAT_RPI) {
 			v <<= 1;
 		}
+		v /= ADC_FULL_RANGE;
 		devData->inpVolt[i] = v;
 	}
 
