@@ -57,7 +57,7 @@ uint16_t devVersion = 0x0001;		// 0.1
 #define DEV_PROBE_PIN			PB1
 #define GROVE_TWO_RX_PIN_NUM		PF0
 
-#define ADC_NR				8
+#define ADC_NR				10
 #define ADC_REF_VOLT			(3300)
 #define ADC_FULL_RANGE			(1 << ADC_RESOLUTION)
 
@@ -74,6 +74,8 @@ enum {
 	REG_RAW_5,
 	REG_RAW_6,
 	REG_RAW_7,
+	REG_RAW_8,        // reserved
+	REG_RAW_9,
 	REG_VOL_0 = 0x20, // voltage, unit 1 milli Volt
 	REG_VOL_1,
 	REG_VOL_2,
@@ -82,6 +84,18 @@ enum {
 	REG_VOL_5,
 	REG_VOL_6,
 	REG_VOL_7,
+	REG_VOL_8,	  // reserved
+	REG_VOL_9,
+	REG_RTO_0 = 0x30, // ratio, unit 0.1%
+	REG_RTO_1,        // adc-input / sensor-vcc
+	REG_RTO_2,
+	REG_RTO_3,
+	REG_RTO_4,
+	REG_RTO_5,
+	REG_RTO_6,
+	REG_RTO_7,
+	REG_RTO_8,	  // reserved
+	REG_RTO_9,	  // reserved
 	REG_CNT,
 	REG_SET_ADDR  = 0xC0, // sets device i2c address
 	REG_JUMP_BOOT = 0xF0, // jump to stm32 (UART) bootloader
@@ -96,10 +110,11 @@ struct {
 	const char* devName;
 	uint16_t adcRaw[ADC_NR];
 	uint16_t inpVolt[ADC_NR];// voltage, unit 0.001 Volt
+	uint16_t ratio[ADC_NR];
 	uint8_t regAddr;
 } devData[1];
 
-uint8_t adcPins[] = { PA0, PA1, PA2, PA3, PA4, PA5, PA6, PA7 };
+uint8_t adcPins[] = { PA0, PA1, PA2, PA3, PA4, PA5, PA6, PA7, NONE, PB1 };
 uint8_t chipId[12] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
 
 /***************************************************************
@@ -200,6 +215,12 @@ void loop()
 
 	// Get ADC Value & Voltage
 	for (int i = 0; i < ADC_NR; i++) {
+		if (adcPins[i] == NONE) {
+			devData->adcRaw[i] = 0;
+			devData->inpVolt[i] = 0;
+			continue;
+		}
+
 		devData->adcRaw[i] = analogRead(adcPins[i]);
 
 		v = (uint32_t)ADC_REF_VOLT * devData->adcRaw[i];
@@ -208,7 +229,23 @@ void loop()
 			v <<= 1;
 		}
 		v /= ADC_FULL_RANGE;
+
+		if (i == REG_RAW_9 - REG_RAW_0) {
+			// ADC_IN9 has a 6.8k and 1K divider resistance
+			if (devData->devType == _DEV_BASE_HAT_RPI) {
+				v >>= 1;
+				v *= 6800 + 1000;
+				v /= 1000;
+			} else if (devData->devType == _DEV_BASE_HAT_RPI_ZERO) {
+				v = ADC_REF_VOLT;
+			}
+		}
 		devData->inpVolt[i] = v;
+	}
+
+	for (int i = 0; i < ADC_NR - 1; i++) {
+		v = devData->inpVolt[i];
+		devData->ratio[i] = 1000UL * v / devData->inpVolt[REG_RAW_9 - REG_RAW_0];
 	}
 
 	// change i2c address
@@ -346,13 +383,15 @@ void requestEvent(void)
 		break;
 
 	default:
-		if (REG_RAW_0 <= devData->regAddr && devData->regAddr <= REG_RAW_7) {
+		if (REG_RAW_0 <= devData->regAddr && devData->regAddr <= REG_RAW_9) {
 			v = devData->regAddr - REG_RAW_0;
 			Wire.write((uint8_t*)&devData->adcRaw[v], sizeof(uint16_t));
-
-		} else if (REG_VOL_0 <= devData->regAddr && devData->regAddr <= REG_VOL_7) {
+		} else if (REG_VOL_0 <= devData->regAddr && devData->regAddr <= REG_VOL_9) {
 			v = devData->regAddr - REG_VOL_0;
 			Wire.write((uint8_t*)&devData->inpVolt[v], sizeof(uint16_t));
+		} else if (REG_RTO_0 <= devData->regAddr && devData->regAddr <= REG_RTO_9) {
+			v = devData->regAddr - REG_RTO_0;
+			Wire.write((uint8_t*)&devData->ratio[v], sizeof(uint16_t));
 		} else if (devData->regAddr != REG_NULL) {
 			v = 0;
 			Wire.write((uint8_t*)&v, sizeof v);
