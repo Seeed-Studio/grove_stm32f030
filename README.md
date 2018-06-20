@@ -42,3 +42,21 @@ C:\Users\<Your-User-Name>\AppData\Local\Arduino15\packages\Seeeduino\hardware\Gr
    1.0.0\libraries\GroveSTM32F030\examples\grove_rpi_base_hat
 ```
 
+2. Grove 5-Way Tactile Switch
+```
+1.0.0\libraries\GroveSTM32F030\examples\grove_5way_tactile_switch
+```
+and check the source, make sure below line defined 
+```
+#define _DEV_TYPE			_DEV_5_WAY_TACTILE_SWITCH
+```
+
+3. Grove 6-Position DIP Switch
+```
+1.0.0\libraries\GroveSTM32F030\examples\grove_5way_tactile_switch
+```
+and check the source, make sure below line defined 
+```
+#define _DEV_TYPE			_DEV_6_POS_DIP_SWITCH
+```
+
