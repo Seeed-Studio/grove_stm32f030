@@ -47,7 +47,7 @@ void TwoWire::begin(void) {
 
 		pinMode(SDA, ALTERNATE);
 		pinMode(SCL, ALTERNATE);
-	} 
+	}
 
 	I2C_DeInit(twi);
 
@@ -66,7 +66,7 @@ void TwoWire::begin(void) {
 	// I2C_InitStructure.I2C_Timing = 0x50100103; // 1000 KHz
 	I2C_Init(twi, &I2C_InitStructure);
 
-	I2C_Cmd(twi, ENABLE);	
+	I2C_Cmd(twi, ENABLE);
 }
 
 void TwoWire::begin(uint8_t address) {
@@ -96,7 +96,7 @@ void TwoWire::begin(uint8_t address) {
 	I2C_Init(twi, &I2C_InitStructure);
 
 	NVIC_SetPriority(I2C1_IRQn, 2);
-	NVIC_EnableIRQ(I2C1_IRQn);   
+	NVIC_EnableIRQ(I2C1_IRQn);
 	I2C_Cmd(twi, ENABLE);
 	I2C_ITConfig(twi, I2C_IT_ADDRI, ENABLE);
 }
@@ -119,7 +119,7 @@ uint8_t TwoWire::requestFrom(uint8_t address, uint8_t quantity, uint8_t sendStop
 	if (quantity > BUFFER_LENGTH)
 		quantity = BUFFER_LENGTH;
 	uint32_t _millis;
-	
+
 	_millis = millis();
 	while(I2C_GetFlagStatus(twi, I2C_FLAG_BUSY) != RESET)
 	{
@@ -130,7 +130,7 @@ uint8_t TwoWire::requestFrom(uint8_t address, uint8_t quantity, uint8_t sendStop
 
 	uint8_t *pBuffer = rxBuffer;
 	uint8_t numByteToRead = quantity;
-	uint8_t bytesRead = 0;	
+	uint8_t bytesRead = 0;
 	/* While there is data to be read */
 	while(numByteToRead)
 	{
@@ -141,26 +141,26 @@ uint8_t TwoWire::requestFrom(uint8_t address, uint8_t quantity, uint8_t sendStop
 		}
 		/* Read a byte from the Slave */
 		*pBuffer = I2C_ReceiveData(twi);
-		
+
 		bytesRead++;
 
 		/* Point to the next location where the byte read will be saved */
 		pBuffer++;
 
 		/* Decrement the read bytes counter */
-		numByteToRead--;	
+		numByteToRead--;
 	}
-	
+
 	_millis = millis();
 	while(I2C_GetFlagStatus(twi, I2C_FLAG_STOPF) == RESET)
 	{
 		if(EVENT_TIMEOUT < (millis() - _millis)) return 0;
 	}
-	
+
 	// set rx buffer iterator vars
 	rxBufferIndex = 0;
 	rxBufferLength = bytesRead;
-	
+
 	return bytesRead;
 }
 
@@ -204,7 +204,7 @@ void TwoWire::beginTransmission(int address) {
 //
 uint8_t TwoWire::endTransmission(uint8_t sendStop) {
 	uint32_t _millis;
-	
+
 	_millis = millis();
 	while(I2C_GetFlagStatus(twi, I2C_FLAG_BUSY) != RESET)
 	{
@@ -213,12 +213,12 @@ uint8_t TwoWire::endTransmission(uint8_t sendStop) {
 	if (sendStop == true)
 	{
 		I2C_TransferHandling(twi, txAddress, txBufferLength, I2C_AutoEnd_Mode, I2C_Generate_Start_Write);
-	} 
-	else 
+	}
+	else
 	{
 		I2C_TransferHandling(twi, txAddress, txBufferLength, I2C_SoftEnd_Mode, I2C_Generate_Start_Write);
 	}
-	
+
 	uint8_t *pBuffer = txBuffer;
 	uint8_t NumByteToWrite = txBufferLength;
 	/* While there is data to be read */
@@ -230,9 +230,9 @@ uint8_t TwoWire::endTransmission(uint8_t sendStop) {
 			if(EVENT_TIMEOUT < (millis() - _millis)) return 0;
 		}
 		/* Send the current byte to slave */
-		I2C_SendData(twi, *pBuffer++);	
+		I2C_SendData(twi, *pBuffer++);
 	}
-	
+
 	_millis = millis();
 	if (sendStop == true)
 	{
@@ -246,9 +246,9 @@ uint8_t TwoWire::endTransmission(uint8_t sendStop) {
 		while(I2C_GetFlagStatus(twi, I2C_FLAG_STOPF) == RESET)
 		{
 			if(EVENT_TIMEOUT < (millis() - _millis)) return 0;
-		}	
+		}
 	}
-	
+
 	// reset tx buffer iterator vars
 	txBufferLength = 0;
 	status = MASTER_IDLE;
@@ -271,7 +271,7 @@ size_t TwoWire::write(uint8_t data) {
 		return 1;
 	} else {
 		if (srvBufferLength >= BUFFER_LENGTH)
-			return 0;		
+			return 0;
 		srvBuffer[srvBufferLength++] = data;
 		return 1;
 	}
@@ -323,50 +323,15 @@ void TwoWire::onRequest(void(*function)(void)) {
 	onRequestCallback = function;
 }
 
-void TwoWire::onService(void) 
-{    
+void TwoWire::onService(void)
+{
 	if (I2C_GetITStatus(twi, I2C_IT_ADDR) == SET)
 	{
 		I2C_ITConfig(twi, I2C_IT_RXI | I2C_IT_TXI | I2C_IT_STOPI, ENABLE);
-		srvBufferLength = 0;
-		srvBufferIndex = 0;
-		if (twi->ISR & (1 << 16))
-		{
-			status = SLAVE_SEND;
-			if (onRequestCallback)
-				onRequestCallback();
-		}
-		else 
-		{
-			status = SLAVE_RECV;
-		}
 
-		I2C_ClearITPendingBit(twi, I2C_IT_ADDR);
-	}
-	if (I2C_GetITStatus(twi, I2C_IT_TXIS) == SET)
-	{		
-		if(status == MASTER_SEND || status == SLAVE_SEND)
-		{
-			if (srvBufferIndex < srvBufferLength)
-			{
-				I2C_SendData(twi, srvBuffer[srvBufferIndex++]);	
-			}
-		}
-		
-		// I2C_ClearITPendingBit(twi, I2C_IT_TXIS);
-	}
-	if (I2C_GetITStatus(twi, I2C_IT_RXNE) == SET)
-	{
-		if (srvBufferLength < BUFFER_LENGTH)
-		{
-			srvBuffer[srvBufferLength++] = I2C_ReceiveData(twi);
-		}
-		
-		// I2C_ClearITPendingBit(twi, I2C_IT_RXNE);
-	}
-	if (I2C_GetITStatus(twi, I2C_IT_STOPF) == SET)
-	{
-		if (status == SLAVE_RECV && onReceiveCallback) 
+		// When repeat start issued, there is no STOP signal
+		// So rxBuffer must be dispose here.
+		if (status == SLAVE_RECV && srvBufferLength && onReceiveCallback)
 		{
 			// Copy data into rxBuffer
 			// (allows to receive another packet while the
@@ -377,11 +342,64 @@ void TwoWire::onService(void)
 			}
 			rxBufferIndex = 0;
 			rxBufferLength = srvBufferLength;
-			
+
 			// Alert calling program
 			onReceiveCallback(rxBufferLength);
 		}
-		
+		srvBufferLength = 0;
+		srvBufferIndex = 0;
+		if (twi->ISR & I2C_ISR_DIR)
+		{
+			status = SLAVE_SEND;
+			if (onRequestCallback)
+				onRequestCallback();
+		}
+		else
+		{
+			status = SLAVE_RECV;
+		}
+
+		I2C_ClearITPendingBit(twi, I2C_IT_ADDR);
+	}
+	if (I2C_GetITStatus(twi, I2C_IT_TXIS) == SET)
+	{
+		if(status == MASTER_SEND || status == SLAVE_SEND)
+		{
+			if (srvBufferIndex < srvBufferLength)
+			{
+				I2C_SendData(twi, srvBuffer[srvBufferIndex++]);
+			}
+		}
+
+		// I2C_ClearITPendingBit(twi, I2C_IT_TXIS);
+	}
+	if (I2C_GetITStatus(twi, I2C_IT_RXNE) == SET)
+	{
+		if (srvBufferLength < BUFFER_LENGTH)
+		{
+			srvBuffer[srvBufferLength++] = I2C_ReceiveData(twi);
+		}
+
+		// I2C_ClearITPendingBit(twi, I2C_IT_RXNE);
+	}
+	if (I2C_GetITStatus(twi, I2C_IT_STOPF) == SET)
+	{
+		if (status == SLAVE_RECV && onReceiveCallback)
+		{
+			// Copy data into rxBuffer
+			// (allows to receive another packet while the
+			// user program reads actual data)
+			for (uint8_t i = 0; i < srvBufferLength; ++i)
+			{
+				rxBuffer[i] = srvBuffer[i];
+			}
+			rxBufferIndex = 0;
+			rxBufferLength = srvBufferLength;
+
+			// Alert calling program
+			onReceiveCallback(rxBufferLength);
+		}
+
 		I2C_ClearITPendingBit(twi, I2C_IT_STOPF);
 		I2C_ITConfig(twi, I2C_IT_RXI | I2C_IT_TXI | I2C_IT_STOPI, DISABLE);
 		I2C_ITConfig(twi, I2C_IT_ADDRI, ENABLE);
@@ -394,7 +412,7 @@ TwoWire Wire = TwoWire(I2C1);
 #ifdef __cplusplus
 extern "C" {
 #endif
-void WIRE_ISR_HANDLER(void) 
+void WIRE_ISR_HANDLER(void)
 {
 	Wire.onService();
 }
