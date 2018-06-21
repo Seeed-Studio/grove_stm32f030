@@ -80,6 +80,7 @@ static const uint8_t A4 = PA4;
 static const uint8_t A5 = PA5;
 static const uint8_t A6 = PA6;
 static const uint8_t A7 = PA7;
+static const uint8_t A17 = PINS_COUNT;
 
 
 extern const unsigned int pin_ADC_Channel[];

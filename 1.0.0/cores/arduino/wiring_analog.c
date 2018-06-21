@@ -64,14 +64,15 @@ uint32_t analogRead(uint32_t ulPin)
 	}
 	#endif
 
-	ulChannel = pin_ADC_Channel[ulPin] ;
-
-	if(g_APinDescription[ulPin].pPort == NULL || ulChannel == NONE )
-	{
+	ulChannel = pin_ADC_Channel[ulPin];
+	if (ulChannel == NONE ) {
 		return -1;
 	}
 
-	pinMode(ulPin, ANALOG);
+	// No real IO pin is permmited, such as Vrefint & temperature
+	if(g_APinDescription[ulPin].pPort != NULL) {
+		pinMode(ulPin, ANALOG);
+	}
 
 	// Convert the ADC1 temperature sensor  with 55.5 Cycles as sampling time
 	ADC_ChannelConfig(ADC1, ulChannel , ADC_SampleTime_55_5Cycles);

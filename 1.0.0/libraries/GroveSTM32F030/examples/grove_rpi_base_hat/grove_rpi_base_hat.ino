@@ -58,8 +58,10 @@ uint16_t devVersion = 0x0001;		// 0.1
 #define GROVE_TWO_RX_PIN_NUM		PF0
 
 #define ADC_NR				10
-#define ADC_REF_VOLT			(3300)
+#define ADC_REF_VOLT			(Vdda)
 #define ADC_FULL_RANGE			(1 << ADC_RESOLUTION)
+uint32_t Vdda = 3300;
+
 
 enum {
 	REG_PID = 0,
@@ -96,6 +98,7 @@ enum {
 	REG_RTO_7,
 	REG_RTO_8,	  // reserved
 	REG_RTO_9,	  // reserved
+	REG_VDDA  = 0x40, // Vdda
 	REG_CNT,
 	REG_SET_ADDR  = 0xC0, // sets device i2c address
 	REG_JUMP_BOOT = 0xF0, // jump to stm32 (UART) bootloader
@@ -209,9 +212,28 @@ void setup()
 	debug(3);
 }
 
+// st.com RM0360.pdf
+// Calculating the actual Vdda voltage
+// using the interval reference voltage
+uint32_t getVDDA(void) {
+	static uint32_t VREFINT_CAL;
+	uint32_t VREFINT_DATA;
+
+	if (VREFINT_CAL == 0UL) {
+		// STM32F030x4/6/8/C DataSheet
+		// 3.10.2 Internal voltage reference(Vrefint)
+		VREFINT_CAL = *((uint16_t*)0x1FFFF7BA);
+	}
+	VREFINT_DATA = analogRead(A17);
+	return 3300UL * VREFINT_CAL / VREFINT_DATA;
+}
+
 void loop()
 {
 	uint32_t v;
+
+	// Update ADC_REF_VOLT
+	Vdda = getVDDA();
 
 	// Get ADC Value & Voltage
 	for (int i = 0; i < ADC_NR; i++) {
@@ -245,7 +267,11 @@ void loop()
 
 	for (int i = 0; i < ADC_NR - 1; i++) {
 		v = devData->inpVolt[i];
-		devData->ratio[i] = 1000UL * v / devData->inpVolt[REG_RAW_9 - REG_RAW_0];
+		v = 1000UL * v / devData->inpVolt[REG_RAW_9 - REG_RAW_0];
+		if (v > 1000UL) {
+			v = 1000UL;
+		}
+		devData->ratio[i] = v;
 	}
 
 	// change i2c address
@@ -392,6 +418,9 @@ void requestEvent(void)
 		} else if (REG_RTO_0 <= devData->regAddr && devData->regAddr <= REG_RTO_9) {
 			v = devData->regAddr - REG_RTO_0;
 			Wire.write((uint8_t*)&devData->ratio[v], sizeof(uint16_t));
+		} else if (devData->regAddr == REG_VDDA) {
+			v = Vdda;
+			Wire.write((uint8_t*)&v, sizeof v);
 		} else if (devData->regAddr != REG_NULL) {
 			v = 0;
 			Wire.write((uint8_t*)&v, sizeof v);

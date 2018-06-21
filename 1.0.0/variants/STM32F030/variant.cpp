@@ -68,7 +68,8 @@ extern const unsigned int pin_ADC_Channel[]=
 	ADC_Channel_6, // 12
 	ADC_Channel_7, // 13
 	ADC_Channel_9, // 14
-	NONE
+	ADC_Channel_Vrefint,// 15, Vrefint
+	NONE,
 };
 
 // TIMER PWM
@@ -186,6 +187,9 @@ void init( void )
   
 	// Wait the ADCEN falg
 	while(!ADC_GetFlagStatus(ADC1, ADC_FLAG_ADEN));	
+
+	// Enable Vrefint channel
+	ADC_VrefintCmd(ENABLE);
 }
 
 
