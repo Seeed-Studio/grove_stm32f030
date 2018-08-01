@@ -268,13 +268,20 @@ void loop()
 		devData->adcRaw[i] = analogRead(adcPins[i]);
 
 		v = (uint32_t)ADC_REF_VOLT * devData->adcRaw[i];
+		#if 0
 		// divider resistance used for RPI version
 		if (devData->devType == _DEV_BASE_HAT_RPI) {
 			v <<= 1;
 		}
+		#endif
 		v /= ADC_FULL_RANGE;
 
 		if (i == REG_RAW_9 - REG_RAW_0) {
+			#if 1
+			// all divider resistance be removed
+			v = ADC_REF_VOLT;
+
+			#else
 			// ADC_IN9 has a 6.8k and 1K divider resistance
 			if (devData->devType == _DEV_BASE_HAT_RPI) {
 				v >>= 1;
@@ -283,6 +290,7 @@ void loop()
 			} else if (devData->devType == _DEV_BASE_HAT_RPI_ZERO) {
 				v = ADC_REF_VOLT;
 			}
+			#endif
 		}
 		devData->inpVolt[i] = v;
 	}
