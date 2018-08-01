@@ -54,7 +54,7 @@ uint32_t analogRead(uint32_t ulPin)
 {
 	uint32_t ulValue = 0;
 	uint32_t ulChannel;
-	ADC_InitTypeDef     ADC_InitStructure;
+	ADC_InitTypeDef ADC_InitStructure;
 
 	// TODO: Bug fix
 	#if 0

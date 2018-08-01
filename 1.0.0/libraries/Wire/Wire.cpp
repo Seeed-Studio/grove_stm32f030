@@ -97,6 +97,7 @@ void TwoWire::begin(uint8_t address) {
 
 	NVIC_SetPriority(I2C1_IRQn, 2);
 	NVIC_EnableIRQ(I2C1_IRQn);
+
 	I2C_Cmd(twi, ENABLE);
 	I2C_ITConfig(twi, I2C_IT_ADDRI, ENABLE);
 }
@@ -328,7 +329,6 @@ void TwoWire::onService(void)
 	if (I2C_GetITStatus(twi, I2C_IT_ADDR) == SET)
 	{
 		I2C_ITConfig(twi, I2C_IT_RXI | I2C_IT_TXI | I2C_IT_STOPI, ENABLE);
-
 		// When repeat start issued, there is no STOP signal
 		// So rxBuffer must be dispose here.
 		if (status == SLAVE_RECV && srvBufferLength && onReceiveCallback)
@@ -365,9 +365,10 @@ void TwoWire::onService(void)
 	{
 		if(status == MASTER_SEND || status == SLAVE_SEND)
 		{
-			if (srvBufferIndex < srvBufferLength)
-			{
+			if (srvBufferIndex < srvBufferLength) {
 				I2C_SendData(twi, srvBuffer[srvBufferIndex++]);
+			} else {
+				I2C_ITConfig(twi, I2C_IT_TXI, DISABLE);
 			}
 		}
 
@@ -402,6 +403,11 @@ void TwoWire::onService(void)
 
 		I2C_ClearITPendingBit(twi, I2C_IT_STOPF);
 		I2C_ITConfig(twi, I2C_IT_RXI | I2C_IT_TXI | I2C_IT_STOPI, DISABLE);
+
+		I2C_Cmd(twi, DISABLE);
+		I2C_ClearITPendingBit(twi, I2C_IT_TXIS);
+		I2C_Cmd(twi, ENABLE);
+
 		I2C_ITConfig(twi, I2C_IT_ADDRI, ENABLE);
 	}
 }

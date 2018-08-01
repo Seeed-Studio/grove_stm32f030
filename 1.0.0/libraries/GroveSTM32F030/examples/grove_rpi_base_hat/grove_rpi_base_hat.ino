@@ -29,6 +29,7 @@
 #include <Flash.h>
 #include <LowPower.h>
 #include <WatchDog.h>
+#define _SER_DEBUG	0
 
 /***************************************************************
  Device type & version
@@ -40,7 +41,7 @@
 
 const char* grove_base_hat_rpi      = "GROVE BASE HAT RPI";
 const char* grove_base_hat_rpi_zero = "GROVE BASE HAT RPI ZERO";
-uint16_t devVersion = 0x0001;		// 0.1
+uint16_t devVersion = 0x0002;		// 0.2
 
 
 /***************************************************************
@@ -55,7 +56,6 @@ uint16_t devVersion = 0x0001;		// 0.1
 #define I2C_CUR_ADDR_FLASH_LOC		0x01
 
 #define DEV_PROBE_PIN			PB1
-#define GROVE_TWO_RX_PIN_NUM		PF0
 
 #define ADC_NR				10
 #define ADC_REF_VOLT			(Vdda)
@@ -117,39 +117,45 @@ struct {
 	uint8_t regAddr;
 } devData[1];
 
-uint8_t adcPins[] = { PA0, PA1, PA2, PA3, PA4, PA5, PA6, PA7, NONE, PB1 };
+uint8_t adcPins[] = { PA0, PA1,
+#if _SER_DEBUG
+NONE, NONE,
+#else
+PA2, PA3,
+#endif
+PA4, PA5, PA6, PA7, NONE, PB1 };
 uint8_t chipId[12] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
 
 /***************************************************************
-
- ***************************************************************/
-LowPower nrgSave;
-
-#define AUTO_SLEEP_TIMEOUT	2000
-uint32_t autoSleepPreviousMillis = 0;
-bool autoSleepFlag = false;
-bool testFlag = false;
-
-/***************************************************************
-
- ***************************************************************/
-
+ ***************************************************************/ 
 void requestEvent();
 void receiveEvent(int howMany);
 
 /***************************************************************
-4 states debug function
- ***************************************************************/
+ * 4-states debug function                                     *
+ **************************************************************/
 int debug(int v) {
+	#if 0
+	/*
+	 * disable gpio debug
+	 * Cause PA13 & PA14 occupy SWD pins
+	 */
 	pinMode(PA13, OUTPUT);
 	pinMode(PA14, OUTPUT);
 	digitalWrite(PA13, (v & 0x01)? HIGH: LOW);
 	digitalWrite(PA14, (v & 0x02)? HIGH: LOW);
+	#elif _SER_DEBUG
+	Serial.print(v);
+	#endif
 	return 0;
 }
 
 void setup()
 {
+	#if _SER_DEBUG
+	Serial.begin(115200);
+	#endif
+
 	uint8_t i2cDefaultAddr = Flash.read8(I2C_DEF_ADDR_FLASH_LOC);
 	uint8_t i2cCurrentAddr = Flash.read8(I2C_CUR_ADDR_FLASH_LOC);
 
@@ -192,10 +198,6 @@ void setup()
 		devData->devName = grove_base_hat_rpi_zero;
 	}
 
-	// The pin need pull up by a resistance
-	pinMode(GROVE_TWO_RX_PIN_NUM, INPUT_PULLUP);
-	nrgSave.begin(GROVE_TWO_RX_PIN_NUM, dummy, CHANGE);
-
 	debug(2);
 
 	devData->regAddr = REG_NULL;
@@ -210,6 +212,12 @@ void setup()
 	wwdg.begin();
 
 	debug(3);
+
+	/* Enable SWD interface */
+	pinMode(PA13, ALTERNATE);
+	pinMode(PA14, ALTERNATE);
+
+	return;
 }
 
 // st.com RM0360.pdf
@@ -228,9 +236,23 @@ uint32_t getVDDA(void) {
 	return 3300UL * VREFINT_CAL / VREFINT_DATA;
 }
 
+void dummy(void) {
+	static uint32_t intLast = 0;
+
+	if (intLast == 0) {
+		intLast = millis();
+	}
+	if (millis() >= intLast + 1000UL) {
+		intLast = millis();
+		debug(9);
+	}
+}
+
 void loop()
 {
 	uint32_t v;
+
+	dummy();
 
 	// Update ADC_REF_VOLT
 	Vdda = getVDDA();
@@ -281,71 +303,12 @@ void loop()
 		Wire.begin(devData->devAddr);
 	}
 
-	if (autoSleepFlag) {
-		uint32_t autoSleepCurrentMillis = millis();
-
-		if ((autoSleepCurrentMillis - autoSleepPreviousMillis) > AUTO_SLEEP_TIMEOUT) {
-			autoSleepPreviousMillis = autoSleepCurrentMillis;
-
-			wwdg.end();
-			Wire.end();
-			pinMode(PA9, INPUT_PULLUP);
-			pinMode(PA10, INPUT_PULLUP);
-
-			nrgSave.standby();
-
-			Wire.begin(devData->devAddr);
-			Wire.onReceive(receiveEvent);
-			Wire.onRequest(requestEvent);
-			wwdg.begin();
-		}
-	}
-
-	if (testFlag) {
-		wwdg.end();
-		pinMode(GROVE_TWO_RX_PIN_NUM, OUTPUT);
-
-		while (1) {
-			digitalWrite(GROVE_TWO_RX_PIN_NUM, HIGH);
-			delay(1);
-
-			digitalWrite(GROVE_TWO_RX_PIN_NUM, LOW);
-			delay(1);
-
-			if (testFlag == false)
-				break;
-		}
-
-		wwdg.begin();
-		attachInterrupt(GROVE_TWO_RX_PIN_NUM, dummy, CHANGE, INPUT_PULLUP);
-	}
-
 	wwdg.reset();
-}
-
-void dummy(void)
-{
-	static uint32_t intStart = 0;
-	static uint32_t intEnd = 0;
-
-	autoSleepPreviousMillis = millis();
-
-	if (digitalRead(GROVE_TWO_RX_PIN_NUM) == LOW) {
-		intStart = millis();
-	} else {
-		intEnd = millis();
-		if ((intEnd - intStart) > 20) {
-			delay(500);
-		} else {
-			intStart = intEnd;
-		}
-	}
 }
 
 void receiveEvent(int howMany)
 {
 	uint8_t i = 0, v, receiveBuffer[4] = { 0, };
-	// autoSleepPreviousMillis = millis();
 
 	while (Wire.available()) {
 		v = Wire.read();
@@ -382,7 +345,12 @@ void requestEvent(void)
 {
 	static const char* name = "";
 	uint16_t v;
-	// autoSleepPreviousMillis = millis();
+
+	if (devData->regAddr == REG_NULL) {
+		v = 0;
+		Wire.write((uint8_t*)&v, sizeof(v));
+		return;
+	}
 
 	switch (devData->regAddr) {
 	case REG_PID:
@@ -431,7 +399,7 @@ void requestEvent(void)
 	#if 0
 	devData->regAddr = REG_NULL;
 	#else
-	// Continuous reading is OK
+	// continuous reading is allowed
 	#endif
 	return;
 }

@@ -35,8 +35,8 @@ extern const PinDescription g_APinDescription[]=
 	{ GPIOA,  0,  RCC_AHBPeriph_GPIOA, GPIO_OType_PP, GPIO_PuPd_NOPULL, GPIO_Speed_50MHz,         0 }, // 4  : ADC
 	{ GPIOA,  1,  RCC_AHBPeriph_GPIOA, GPIO_OType_PP, GPIO_PuPd_NOPULL, GPIO_Speed_50MHz,         0 }, // 5  : ADC
 
-	{ GPIOA, 13,  RCC_AHBPeriph_GPIOA, GPIO_OType_PP, GPIO_PuPd_NOPULL, GPIO_Speed_50MHz,         0 }, // 6  :
-	{ GPIOA, 14,  RCC_AHBPeriph_GPIOA, GPIO_OType_PP, GPIO_PuPd_NOPULL, GPIO_Speed_50MHz,         0 }, // 7  :
+	{ GPIOA, 13,  RCC_AHBPeriph_GPIOA, GPIO_OType_PP, GPIO_PuPd_UP,     GPIO_Speed_50MHz, GPIO_AF_0 }, // 6  :
+	{ GPIOA, 14,  RCC_AHBPeriph_GPIOA, GPIO_OType_PP, GPIO_PuPd_UP,     GPIO_Speed_50MHz, GPIO_AF_0 }, // 7  :
 	{ GPIOF,  0,  RCC_AHBPeriph_GPIOF, GPIO_OType_PP, GPIO_PuPd_NOPULL, GPIO_Speed_50MHz,         0 }, // 8  :
 	{ GPIOF,  1,  RCC_AHBPeriph_GPIOF, GPIO_OType_PP, GPIO_PuPd_NOPULL, GPIO_Speed_50MHz,         0 }, // 9  :
 
