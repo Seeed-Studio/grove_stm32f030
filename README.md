@@ -1,8 +1,8 @@
 # Usage for Windows:
 
-1. °²×°Arduino version >= 1.6, Git for Windows with MSYS
+1. å®‰è£…Arduino version >= 1.6, Git for Windows with MSYS
 
-2. ´ò¿ªGit for Windows,ÔËĞĞÈçÏÂÃüÁî
+2. æ‰“å¼€Git for Windows,è¿è¡Œå¦‚ä¸‹å‘½ä»¤
 ```
 cd ~/AppData/Local/Arduino15/
 mkdir -p packages/Seeeduino/hardware
@@ -12,34 +12,39 @@ git clone https://gitlab.com/seeedstudio/grove_stm32f030.git Grove_STM32F030
 cp Grove_STM32F030/package_grove_stm32f030_index.json ../../../
 ```
 
-4. ÓÃÎÄ±¾±à¼­Æ÷´ò¿ªjsonÎÄ¼ş
+4. ç”¨æ–‡æœ¬ç¼–è¾‘å™¨æ‰“å¼€jsonæ–‡ä»¶
    ```
    CC:\Users\<Your-User-Name>\AppData\Local\Arduino15\package_grove_stm32f030_index.json
    ```
-   ÕÒµ½stm32_serial_upload_toolºÍarm-none-eabi-gccµÄÏÂÔØµØÖ·£¬ÏÂÔØºó½âÑ¹µ½
+   æ‰¾åˆ°stm32_serial_upload_toolå’Œarm-none-eabi-gccçš„ä¸‹è½½åœ°å€ï¼Œä¸‹è½½åè§£å‹åˆ°
    ```
    C:\Users\<Your-User-Name>\AppData\Local\Arduino15\packages\Seeeduino\tools
    ```
 
-5. ´ò¿ªArduino,"¹¤¾ß"->"¿ª·¢°å",Ñ¡ÔñÎª "Grove STM32F030"
+5. æ‰“å¼€Arduino,"å·¥å…·"->"å¼€å‘æ¿",é€‰æ‹©ä¸º "Grove STM32F030"
 
-6. µã»÷ "ÎÄ¼ş"->"Ê¾Àı",Ñ¡Ôñ"Examples for Grove STM32F030" ÖĞÈÎÒâÀı³Ì
+6. ç‚¹å‡» "æ–‡ä»¶"->"ç¤ºä¾‹",é€‰æ‹©"Examples for Grove STM32F030" ä¸­ä»»æ„ä¾‹ç¨‹
 
-7. µã»÷ "ÑéÖ¤" ¼´¿ªÊ¼±àÒë
+7. ç‚¹å‡» "éªŒè¯" å³å¼€å§‹ç¼–è¯‘
 
 
 # Note:
-É¾³ıÎÄ¼ş¼Ğ
+1. åˆ é™¤æ–‡ä»¶å¤¹
 ```
 C:\Users\<Your-User-Name>\AppData\Local\Arduino15\packages\Seeeduino\hardware\Grove_STM32F030\
 ```
-ÏÂ³ı1.0.0ÒÔÍâµÄËùÓĞÎÄ¼şºÍÎÄ¼ş¼Ğ£¬·ñÔòArduino±àÒë±¨´í¡£
+ä¸‹é™¤1.0.0ä»¥å¤–çš„æ‰€æœ‰æ–‡ä»¶å’Œæ–‡ä»¶å¤¹(é™¤äº†.jsonæ–‡ä»¶)ï¼Œå¦åˆ™Arduinoç¼–è¯‘æŠ¥é”™ã€‚
 
+2. å½“ä½¿ç”¨arduino IDEçš„å¼€å‘æ¿ç®¡ç†åŠŸèƒ½æ—¶ï¼Œ
+**C:\Users\<Your-User-Name>\AppData\Local\Arduino15\**ç›®å½•ä¸‹çš„ package_grove_stm32f030_index.jsonæ–‡ä»¶ä¼šè¢«ç³»ç»Ÿåˆ é™¤ï¼Œå‡ºç°åœ¨arduino IDE é€‰æ‹©å¼€å‘æ¿æ—¶æ²¡æœ‰
+Grove STM32F030 é€‰é¡¹ï¼Œè¿™æ—¶å€™éœ€è¦å°†**C:\Users\<Your-User-Name>\AppData\Local\Arduino15\packages\Seeeduino\hardware\Grove_STM32F030**è·¯å¾„ä¸‹çš„package_grove_stm32f030_index.jsonæ–‡ä»¶
+é‡æ–°å¤åˆ¶åˆ°**C:\Users\<Your-User-Name>\AppData\Local\Arduino15\**ç›®å½•ä¸‹
 
+3. ä¾‹ç¨‹ç¼–è¯‘å‡ºæ¥çš„binæ–‡ä»¶æˆ–hexæ–‡ä»¶åœ¨C:\Users\<Your-User-Name>\AppData\Local\Tempç›®å½•ä¸‹ï¼Œç›¸å¯¹åº”çš„æ–‡ä»¶å¯ä»¥æŸ¥çœ‹arduino IDEçš„ä¸‹æ–¹çš„ç¼–è¯‘log.å¦‚æœæ˜¯binæ–‡ä»¶ï¼Œæ–‡ä»¶ä¸‹è½½å¼€å§‹åœ°å€ä¸º0x8000000,SWDä¸‹è½½æ–¹å¼ã€‚
 # Projects Location
 1. Grove Base Hat for PI/PI-Zero
 ```
-   1.0.0\libraries\GroveSTM32F030\examples\grove_rpi_base_hat
+   1.0.0\libraries\GroveSTM32F030\examples\grove_rpi_base_hatï¼Œ//è¿™ä¸ªä¾‹ç¨‹æ˜¯å¤šé€šé“ADCï¼Œstm32f030ä½œä¸ºä»æœº
 ```
 
 2. Grove 5-Way Tactile Switch
