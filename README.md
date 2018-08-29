@@ -36,11 +36,11 @@ C:\Users\<Your-User-Name>\AppData\Local\Arduino15\packages\Seeeduino\hardware\Gr
 下除1.0.0以外的所有文件和文件夹(除了.json文件)，否则Arduino编译报错。
 
 2. 当使用arduino IDE的开发板管理功能时，
-** C:\Users\<Your-User-Name>\AppData\Local\Arduino15\ ** 目录下的 package_grove_stm32f030_index.json文件会被系统删除，出现在arduino IDE 选择开发板时没有
-Grove STM32F030 选项，这时候需要将 **C:\Users\<Your-User-Name>\AppData\Local\Arduino15\packages\Seeeduino\hardware\Grove_STM32F030** 路径下的 package_grove_stm32f030_index.json 文件
-重新复制到** C:\Users\<Your-User-Name>\AppData\Local\Arduino15\ **目录下
+ C:\Users\<Your-User-Name>\AppData\Local\Arduino15\  目录下的 package_grove_stm32f030_index.json文件会被系统删除，出现在arduino IDE 选择开发板时没有
+Grove STM32F030 选项，这时候需要将 C:\Users\<Your-User-Name>\AppData\Local\Arduino15\packages\Seeeduino\hardware\Grove_STM32F030 路径下的 package_grove_stm32f030_index.json 文件
+重新复制到 C:\Users\<Your-User-Name>\AppData\Local\Arduino15\ 目录下
 
-3. 例程编译出来的bin文件或hex文件在 **C:\Users\<Your-User-Name>\AppData\Local\Temp **目录下，相对应的文件可以查看arduino IDE的下方的编译log.如果是bin文件，文件下载开始地址为0x8000000,SWD下载方式。
+3. 例程编译出来的bin文件或hex文件在 C:\Users\<Your-User-Name>\AppData\Local\Temp 目录下，相对应的文件可以查看arduino IDE的下方的编译log.如果是bin文件，文件下载开始地址为0x8000000,SWD下载方式。
 # Projects Location
 1. Grove Base Hat for PI/PI-Zero
 ```
