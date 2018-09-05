@@ -62,7 +62,8 @@ uint16_t devVersion = 0x0002;		// 0.2
 #define ADC_FULL_RANGE			(1 << ADC_RESOLUTION)
 uint32_t Vdda = 3300;
 
-
+// enable SET_ADDR command
+#define _EN_SET_ADDR			0
 enum {
 	REG_PID = 0,
 	REG_VID,
@@ -304,12 +305,14 @@ void loop()
 		devData->ratio[i] = v;
 	}
 
+	#if _EN_SET_ADDR
 	// change i2c address
 	if (devData->regAddr == REG_SET_ADDR) {
 		devData->regAddr = REG_NULL;
 		Flash.write8(I2C_CUR_ADDR_FLASH_LOC, devData->devAddr);
 		Wire.begin(devData->devAddr);
 	}
+	#endif
 
 	wwdg.reset();
 }
@@ -329,13 +332,18 @@ void receiveEvent(int howMany)
 	devData->regAddr = receiveBuffer[0];
 
 	switch (devData->regAddr) {
+	#if _EN_SET_ADDR
 	case REG_SET_ADDR:
 		devData->devAddr = receiveBuffer[1];
 		break;
+	#endif
 
+	// It's terrible functions for cmd i2cdump
+	#if 0
 	case REG_JUMP_BOOT:
 		jumpToBootloader();
 		break;
+	#endif
 
 	default:
 		break;

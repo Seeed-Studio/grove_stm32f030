@@ -234,7 +234,7 @@ void bootloader(void)
 	if(readBootFlag()) // BOOT
 	{
 		writeBootFlag(false);
-		
+
 		uint32_t JumpAddress;
 		
 		// Remap SRAM at 0x00000000
