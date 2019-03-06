@@ -46,7 +46,7 @@ const char versions[VERSIONS_SZ] =
 #else
 #error Please specify proper device type _DEV_TYPE
 #endif
-"0.1";					// real version
+"0.2";					// real version
 
 
 /***************************************************************
@@ -174,8 +174,6 @@ LowPower nrgSave;
 #define AUTO_SLEEP_TIMEOUT	2000
 uint32_t clickCheckPreviousMillis = 0;
 uint32_t autoSleepPreviousMillis = 0;
-bool autoSleepFlag = false;
-bool testFlag = false;
 
 /***************************************************************
 
@@ -245,6 +243,7 @@ void loop()
 		}
 	}
 
+	#if 0
 	if (commandReceive == I2C_CMD_SET_ADDR) {	// change i2c address
 		commandReceive = I2C_CMD_NULL;
 		Flash.write8(I2C_CUR_ADDR_FLASH_LOC, deviceI2CAddress);
@@ -255,45 +254,7 @@ void loop()
 		Flash.write8(I2C_CUR_ADDR_FLASH_LOC, deviceI2CAddress);
 		Wire.begin(deviceI2CAddress);
 	}
-
-	if (autoSleepFlag) {
-		uint32_t autoSleepCurrentMillis = millis();
-
-		if ((autoSleepCurrentMillis - autoSleepPreviousMillis) > AUTO_SLEEP_TIMEOUT) {
-			autoSleepPreviousMillis = autoSleepCurrentMillis;
-
-			wwdg.end();
-			Wire.end();
-			pinMode(PA9, INPUT_PULLUP);
-			pinMode(PA10, INPUT_PULLUP);
-
-			nrgSave.standby();
-
-			Wire.begin(deviceI2CAddress);
-			Wire.onReceive(receiveEvent);
-			Wire.onRequest(requestEvent);
-			wwdg.begin();
-		}
-	}
-
-	if (testFlag) {
-		wwdg.end();
-		pinMode(GROVE_TWO_RX_PIN_NUM, OUTPUT);
-
-		while (1) {
-			digitalWrite(GROVE_TWO_RX_PIN_NUM, HIGH);
-			delay(1);
-
-			digitalWrite(GROVE_TWO_RX_PIN_NUM, LOW);
-			delay(1);
-
-			if (testFlag == false)
-				break;
-		}
-
-		wwdg.begin();
-		attachInterrupt(GROVE_TWO_RX_PIN_NUM, dummy, CHANGE, INPUT_PULLUP);
-	}
+	#endif
 
 	wwdg.reset();
 }
@@ -382,7 +343,7 @@ void receiveEvent(int howMany)
 		btnData->detect_mode = _DETECT_MODE_BLOCK;
 		commandReceive = I2C_CMD_NULL;
 		break;
-
+	#if 0
 	case I2C_CMD_SET_ADDR:
 		deviceI2CAddress = receiveBuffer[1];
 		break;
@@ -401,6 +362,7 @@ void receiveEvent(int howMany)
 		commandReceive = I2C_CMD_NULL;
 		jumpToBootloader();
 		break;
+	#endif
 
 	default:
 		break;
@@ -514,7 +476,12 @@ int buttonClearEvent(void) {
 	for (int i = 0; i < BUTTON_NR; i++) {
 		// clear all events except raw
 		btnData->button_evts[i] &= BTN_EV_RAW_STATUS;
+		/*
+		 * Here is the Bug of v0.1, lead to miss event BTN_EV_LEVEL_CHANGED
+		 */
+		/*
 		btnData->last_evts[i] = btnData->button_evts[i];
+		*/
 	}
 	return 0;
 }
