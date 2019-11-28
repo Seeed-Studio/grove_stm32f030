@@ -29,13 +29,13 @@ typedef enum _eAnalogReference
   AR_DEFAULT,
 } eAnalogReference ;
 
-
 void analogReference(eAnalogReference ulMode) ;
 void analogWrite(uint32_t ulPin, uint32_t ulValue) ;
 uint32_t analogRead(uint32_t ulPin) ;
 void analogReadResolution(int res);
 void analogWriteResolution(int res);
 void analogOutputInit(void) ;
+void setPWMfrequence(uint32_t _frequence);
 
 #ifdef __cplusplus
 }

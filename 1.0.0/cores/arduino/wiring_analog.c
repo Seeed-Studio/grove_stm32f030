@@ -25,7 +25,7 @@ extern "C" {
 
 static int _readResolution = 10;
 static int _writeResolution = 8;
-
+static int _pwm__frequence = PWM_FREQUENCY;
 void analogReadResolution(int res)
 {
 	_readResolution = res;
@@ -128,7 +128,7 @@ void analogWrite(uint32_t ulPin, uint32_t ulValue)
 	ulValue = mapResolution(ulValue, _writeResolution, PWM_RESOLUTION);
 	
     uint16_t TimerPeriod = (uint16_t)(SystemCoreClock / 1000000) - 1;
-	uint16_t TimerARP = (uint16_t)(1000000 / PWM_FREQUENCY) - 1;
+	uint16_t TimerARP = (uint16_t)(1000000 / _pwm__frequence) - 1;
     uint16_t Duty_Cycle = (uint16_t)((ulValue * 100) / 255);
 	uint16_t ChannelPulse = (uint16_t)((Duty_Cycle * (TimerARP + 1)) / 100);
 	
@@ -198,7 +198,17 @@ void analogWrite(uint32_t ulPin, uint32_t ulValue)
 
 	// TIMx Main Output Enable
 	TIM_CtrlPWMOutputs(TIMx, ENABLE);
+
+	
 }
+
+// allow to change pwm frequence
+void setPWMfrequence(uint32_t _frequence)
+{
+	_pwm__frequence = _frequence;
+	
+}
+
 
 #ifdef __cplusplus
 }
