@@ -49,8 +49,9 @@ If you use bin target file, careful the downloading address of MCU is 0x8000000.
 
 
 # burn/flash image/elf to STM32F030
-Most of time, we can use JLink to flash the MCU STM32F030 device, I think this is a simple method.  
-For advanced user play with Grove-RPi-Base-Hat, also can use RPi as a OpenOCD device,  see
+Most of time, we can use SEGGER JLink/J-Flash to flash the MCU STM32F030 device, I think this is a simple method, 
+cause which has a wizard steps.  
+Advanced user play with RPi & Grove-RPi-Base-Hat, also can use the RPi as a OpenOCD device, see
 [Programming Microcontrollers using OpenOCD on a Raspberry Pi](https://learn.adafruit.com/programming-microcontrollers-using-openocd-on-raspberry-pi?view=all)
 
 
