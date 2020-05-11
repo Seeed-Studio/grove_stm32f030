@@ -48,6 +48,12 @@ Enable the compiling log feature of Arduino to find the specific path in the log
 If you use bin target file, careful the downloading address of MCU is 0x8000000.
 
 
+# burn/flash image/elf to STM32F030
+Most of time, we can use JLink to flash the MCU STM32F030 device, I think this is a simple method.  
+For advanced user play with Grove-RPi-Base-Hat, also can use RPi as a OpenOCD device,  see
+[Programming Microcontrollers using OpenOCD on a Raspberry Pi](https://learn.adafruit.com/programming-microcontrollers-using-openocd-on-raspberry-pi?view=all)
+
+
 # Projects Location
 1. Grove Base Hat for PI/PI-Zero
    ```
