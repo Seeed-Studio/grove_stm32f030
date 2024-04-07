@@ -91,17 +91,9 @@ uint32_t analogRead(uint32_t ulPin)
 	return ulValue;
 }
 
-
-static uint8_t pinEnabled[PINS_COUNT];
-
-void analogOutputInit(void)
-{
-	uint8_t i;
-	for(i=0; i<PINS_COUNT; i++)pinEnabled[i] = 0;
-}
-
 void analogWrite(uint32_t ulPin, uint32_t ulValue)
 {
+	static uint8_t pinEnabled[PINS_COUNT] = {0};
 
 	if(g_APinDescription[ulPin].pPort == NULL)
 	{
@@ -112,23 +104,15 @@ void analogWrite(uint32_t ulPin, uint32_t ulValue)
 	    // Defaults to digital write
 		pinMode(ulPin, OUTPUT);
 		ulValue = mapResolution(ulValue, _writeResolution, 8);
-		if(ulValue < 128)
-		{
-			digitalWrite(ulPin, LOW);
-		}
-		else
-		{
-			digitalWrite(ulPin, HIGH);
-		}
-
+		digitalWrite(ulPin, (ulValue < 128) ? LOW : HIGH);
 		return;
 	}
 	TIM_TypeDef *TIMx = pin_TIM[ulPin];
 	
 	ulValue = mapResolution(ulValue, _writeResolution, PWM_RESOLUTION);
 	
-    uint16_t TimerPeriod = (uint16_t)(SystemCoreClock / 1000000) - 1;
-	uint16_t TimerARP = (uint16_t)(1000000 / _pwm__frequence) - 1;
+    uint16_t TimerPeriod = (uint16_t)(SystemCoreClock / PWM_BASE_FREQUENCY) - 1;
+	uint32_t TimerARP = (uint16_t)(PWM_BASE_FREQUENCY / _pwm__frequence) - 1;
     uint16_t Duty_Cycle = (uint16_t)((ulValue * 100) / 255);
 	uint16_t ChannelPulse = (uint16_t)((Duty_Cycle * (TimerARP + 1)) / 100);
 	
@@ -147,6 +131,10 @@ void analogWrite(uint32_t ulPin, uint32_t ulValue)
 		{
 			RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM14, ENABLE);
 		}
+		else if(TIMx == TIM16)
+		{
+			RCC_APB2PeriphClockCmd(RCC_APB2Periph_TIM16, ENABLE);
+		}
 		
 		TIM_TimeBaseStructure.TIM_Prescaler = TimerPeriod;
 		TIM_TimeBaseStructure.TIM_CounterMode = TIM_CounterMode_Up;
@@ -157,6 +145,11 @@ void analogWrite(uint32_t ulPin, uint32_t ulValue)
 		TIM_TimeBaseInit(TIMx, &TIM_TimeBaseStructure);
 		pinEnabled[ulPin] = 1;
 	}
+	else
+	{
+		TIM_SetAutoreload(TIMx, TimerARP);
+	}
+
 	TIM_OCInitStructure.TIM_OCMode = TIM_OCMode_PWM1;
 	TIM_OCInitStructure.TIM_OutputState = TIM_OutputState_Enable;
 	TIM_OCInitStructure.TIM_OutputNState = TIM_OutputNState_Disable;
@@ -197,16 +190,20 @@ void analogWrite(uint32_t ulPin, uint32_t ulValue)
 	TIM_Cmd(TIMx, ENABLE);
 
 	// TIMx Main Output Enable
-	TIM_CtrlPWMOutputs(TIMx, ENABLE);
-
-	
+	if (IS_TIM_LIST2_PERIPH(TIMx))
+	{
+		TIM_BDTRInitTypeDef TIM_BDTRInitStructure;
+		TIM_BDTRStructInit(&TIM_BDTRInitStructure);
+		TIM_BDTRInitStructure.TIM_BreakPolarity = TIM_BreakPolarity_High;
+		TIM_BDTRConfig(&TIMx, &TIM_BDTRInitStructure);
+		TIM_CtrlPWMOutputs(TIMx, ENABLE);
+	}
 }
 
 // allow to change pwm frequence
 void setPWMfrequence(uint32_t _frequence)
 {
-	_pwm__frequence = _frequence;
-	
+	_pwm__frequence = _frequence > 0 ? _frequence : PWM_FREQUENCY;
 }
 
 

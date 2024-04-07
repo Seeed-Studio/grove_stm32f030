@@ -88,9 +88,10 @@ extern const TIM_TypeDef* pin_TIM[];
 extern const uint16_t pin_TIM_Channel[];
 
 
-#define ADC_RESOLUTION		12
-#define PWM_FREQUENCY		40000
-#define PWM_RESOLUTION		8
+#define ADC_RESOLUTION		 12
+#define PWM_BASE_FREQUENCY 500000
+#define PWM_FREQUENCY      50
+#define PWM_RESOLUTION		 8
 #define WIRE_ISR_HANDLER	I2C1_IRQHandler
 
 
