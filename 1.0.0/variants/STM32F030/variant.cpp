@@ -42,7 +42,7 @@ extern const PinDescription g_APinDescription[]=
 
 	{ GPIOA,  4,  RCC_AHBPeriph_GPIOA, GPIO_OType_PP, GPIO_PuPd_NOPULL, GPIO_Speed_50MHz, GPIO_AF_4 }, // 10 : PWM/SS
 	{ GPIOA,  5,  RCC_AHBPeriph_GPIOA, GPIO_OType_PP, GPIO_PuPd_NOPULL, GPIO_Speed_50MHz, GPIO_AF_0 }, // 11 : ADC/SCK
-	{ GPIOA,  6,  RCC_AHBPeriph_GPIOA, GPIO_OType_PP, GPIO_PuPd_NOPULL, GPIO_Speed_50MHz, GPIO_AF_0 }, // 12 : ADC/MISO
+	{ GPIOA,  6,  RCC_AHBPeriph_GPIOA, GPIO_OType_PP, GPIO_PuPd_NOPULL, GPIO_Speed_50MHz, GPIO_AF_5 }, // 12 : ADC/MISO
 	{ GPIOA,  7,  RCC_AHBPeriph_GPIOA, GPIO_OType_PP, GPIO_PuPd_NOPULL, GPIO_Speed_50MHz, GPIO_AF_0 }, // 13 : ADC/MOSI
 	{ GPIOB,  1,  RCC_AHBPeriph_GPIOB, GPIO_OType_PP, GPIO_PuPd_NOPULL, GPIO_Speed_50MHz, GPIO_AF_1 }, // 14 : PWM
 
@@ -87,7 +87,7 @@ extern const TIM_TypeDef* pin_TIM[]=
 	NULL,          // 9
 	TIM14,         // 10
 	NULL,          // 11
-	NULL,          // 12
+	TIM16,         // 12
 	NULL,          // 13
 	TIM3,          // 14
 	NULL
@@ -107,7 +107,7 @@ extern const uint16_t pin_TIM_Channel[]=
 	NONE, 		   // 9
 	TIM_Channel_1, // 10
 	NONE, 		   // 11
-	NONE, 		   // 12
+	TIM_Channel_1, // 12
 	NONE, 		   // 13
 	TIM_Channel_4, // 14
 	NONE
