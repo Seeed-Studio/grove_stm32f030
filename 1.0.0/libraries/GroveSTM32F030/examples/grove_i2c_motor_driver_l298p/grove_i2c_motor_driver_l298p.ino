@@ -99,7 +99,7 @@ void receiveEvent(int a)
   }
   else if (PWMFrequenceSet == receive_buffer[0])
   {
-    PWMfrequenceSet(receive_buffer[1]);
+    PWMfrequenceSet(receive_buffer[1]+(receive_buffer[2]<<8));
   }
   else if (DirectionSet == receive_buffer[0])
   {
@@ -170,7 +170,7 @@ void directionSet(uint8_t _direction)
   }
 }
 
-void PWMfrequenceSet(uint8_t _frequence)
+void PWMfrequenceSet(uint32_t _frequence)
 {
   setPWMfrequence(_frequence);
 }
