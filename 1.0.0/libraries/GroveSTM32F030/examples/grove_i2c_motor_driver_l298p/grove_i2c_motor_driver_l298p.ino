@@ -50,7 +50,7 @@ int speed1=0;
 int speed2=0;
 void setup()
 {
-  setPWMfrequence(50);
+  setPWMfrequence(490);
   pinMode(ADDR4, INPUT);
   pinMode(ADDR3, INPUT);
   pinMode(ADDR2, INPUT);
@@ -99,7 +99,7 @@ void receiveEvent(int a)
   }
   else if (PWMFrequenceSet == receive_buffer[0])
   {
-    PWMfrequenceSet(receive_buffer[1]+(receive_buffer[2]<<8));
+    PWMfrequenceSet((receive_buffer[1]<<8)+receive_buffer[2]);
   }
   else if (DirectionSet == receive_buffer[0])
   {
