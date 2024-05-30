@@ -2,6 +2,10 @@
 
 Here are some Arduino IDE-based firmware for Grove STM32F030.
 
+No need to build unless you want to modify the firmware.
+
+grove_i2c_motor_driver_stm32f030V103.ino.bin is ready to burn. It must be used with [Grove_I2C_Motor_Driver_v1_3](../../../../Grove_I2C_Motor_Driver_v1_3) V1.03 or higher.
+
 ## Build
 
 1. Open a `.ino` firmware in `Arduino`, select `Tool` -> `Board:` -> `Grove STM32F030`.
