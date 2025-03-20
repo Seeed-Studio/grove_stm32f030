@@ -2,18 +2,6 @@
 #include <Flash.h>
 #include <WatchDog.h>
 
-/**************Motor Direction***************/
-#define BothClockWise 0x0a      //1010
-#define BothAntiClockWise 0x05  //0101
-#define M1CWM2ACW 0x06          //0110
-#define M1ACWM2CW 0x09          //1001
-
-#define M1CWM2ST 0x02   //0010
-#define M1ACWM2ST 0x01  //0001
-#define M1STM2CW 0x08   //1000
-#define M1STM2ACW 0x04  //0100
-#define M1STM2ST 0x00   //0000
-
 //Motor 2 Input
 #define IN4 1  //PA2
 #define IN3 0  //PA3
@@ -32,6 +20,14 @@
 #define DirectionSet 0xaa
 #define MotorSetA 0xa1
 #define MotorSetB 0xa5
+#define GetSpeed 0x90      //new v105
+#define GetVersion 0x91    //new V105
+#define GetTimedout 0x92   //new V105
+#define GetTimeout 0x93    //new V105
+#define SetTimeout 0x86    //new V1055:motor stop after timout
+#define Timeoutreset 0x88  //new V1055:motor stop after timout
+
+#define Version 105  //new V105 - firmware version number
 
 #define MOTOR1 1
 #define MOTOR2 2
@@ -48,8 +44,15 @@
 int address = 0;
 int speed1 = 0;
 int speed2 = 0;
+byte Status = GetSpeed;  //default=getSpeed=V103
+
+unsigned long timeout = 0;      //timeout in ms - 0 = no timeout
+unsigned long tTimeout = 0;     //timeout timer
+unsigned long trefTimeout = 0;  //timeout reference time
+bool timedout = false;          //true if stopped by timeout
+
 void setup() {
-  setPWMfrequence(490);
+  //setPWMfrequence(490);
   pinMode(ADDR4, INPUT);
   pinMode(ADDR3, INPUT);
   pinMode(ADDR2, INPUT);
@@ -77,7 +80,16 @@ void setup() {
 }
 
 void loop() {
-  delay(1000);
+  //watchdog
+  tTimeout = millis() - trefTimeout;
+  if (timeout > 0) {             //timeout active
+    if (!timedout) {             //timeout did not occur
+      if (tTimeout > timeout) {  //Time over timeout
+        directionSet(0);         //stop motor
+        timedout = true;         //boolean true
+      }
+    }
+  }
 }
 
 void receiveEvent(int a) {
@@ -94,13 +106,19 @@ void receiveEvent(int a) {
     PWMfrequenceSet(receive_buffer[1] + (receive_buffer[2] << 8));
   } else if (DirectionSet == receive_buffer[0]) {
     directionSet(receive_buffer[1]);
+  } else if (0x90 == (receive_buffer[0] & 0xf0)) {  //if start with 0x9. -> get....
+    Status = receive_buffer[0];
+  } else if (SetTimeout == receive_buffer[0]) {
+    TimeoutSet(receive_buffer[1] + (receive_buffer[2] << 8));
+  } else if (Timeoutreset == receive_buffer[0]) {
+    TimeoutReset();
   }
 }
 
-//  BothClockWise             0x0a  两个顺时针
-//  BothAntiClockWise         0x05  两个逆时针
-//  M1CWM2ACW                 0x06  1顺时针2逆时针
-//  M1ACWM2CW                 0x09  1逆时针2顺时针
+//  BothClockWise             0x0a=0b1010  两个顺时针
+//  BothAntiClockWise         0x05=0b0101  两个逆时针
+//  M1CWM2ACW                 0x06=0b0110  1顺时针2逆时针
+//  M1ACWM2CW                 0x09=0b1001  1逆时针2顺时针
 
 void directionSet(uint8_t _direction) {
   //Define direction
@@ -111,10 +129,12 @@ void directionSet(uint8_t _direction) {
   digitalWrite(IN2, bitRead(_direction, 1));
   digitalWrite(IN3, bitRead(_direction, 2));
   digitalWrite(IN4, bitRead(_direction, 3));
+  TimeoutReset();
 }
 
 void PWMfrequenceSet(uint32_t _frequence) {
   setPWMfrequence(_frequence);
+  TimeoutReset();
 }
 
 void MotorspeedSet(uint8_t _speed1, uint8_t _speed2) {
@@ -122,9 +142,39 @@ void MotorspeedSet(uint8_t _speed1, uint8_t _speed2) {
   speed2 = _speed2;
   analogWrite(EA, _speed1);
   analogWrite(EB, _speed2);
+  TimeoutReset();
+}
+
+void TimeoutSet(uint32_t _timeout) {
+  timeout = _timeout;
+  TimeoutReset();
+}
+
+void TimeoutReset() {
+  if (timeout > 0) {
+    trefTimeout = millis();
+    timedout = false;
+  }
 }
 
 void requestEvent() {
-  Wire.write(speed1);
-  Wire.write(speed2);
+  switch (Status) {
+    case GetSpeed:
+      Wire.write(speed1);
+      Wire.write(speed2);
+      break;
+    case GetVersion:
+      Wire.write(Version);
+      Wire.write(0);
+    case GetTimedout:
+      Wire.write(timedout);
+      Wire.write(0);
+    case GetTimeout:
+      Wire.write(timeout & 0x000000ff);
+      Wire.write((timeout & 0x0000ff00) >> 8);
+    default:  //should never occur
+      Wire.write(254);
+      Wire.write(255);
+      break;
+  }
 }
